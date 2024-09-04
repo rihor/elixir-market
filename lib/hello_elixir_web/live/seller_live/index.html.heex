@@ -1,0 +1,56 @@
+<.header>
+  Listing Sellers
+  <:actions>
+    <.link patch={~p"/sellers/new"}>
+      <.button>New Seller</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="sellers"
+  rows={@streams.sellers}
+  row_click={fn {_id, seller} -> JS.navigate(~p"/sellers/#{seller}") end}
+>
+  <:col :let={{_id, seller}} label="Name"><%= seller.name %></:col>
+
+  <:col :let={{_id, seller}} label="Products">
+    <ul>
+      <%= if Ecto.assoc_loaded?(seller.products) do %>
+        <%= for product <- seller.products do %>
+          <li><%= product.name %></li>
+        <% end %>
+      <% end %>
+    </ul>
+  </:col>
+  <:action :let={{_id, seller}}>
+    <div class="sr-only">
+      <.link navigate={~p"/sellers/#{seller}"}>Show</.link>
+    </div>
+    <.link patch={~p"/sellers/#{seller}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, seller}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: seller.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="seller-modal"
+  show
+  on_cancel={JS.patch(~p"/sellers")}
+>
+  <.live_component
+    module={HelloElixirWeb.SellerLive.FormComponent}
+    id={@seller.id || :new}
+    title={@page_title}
+    action={@live_action}
+    seller={@seller}
+    patch={~p"/sellers"}
+  />
+</.modal>

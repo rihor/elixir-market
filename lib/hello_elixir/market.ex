@@ -18,7 +18,7 @@ defmodule HelloElixir.Market do
 
   """
   def list_sellers do
-    Repo.all(Seller)
+    Repo.all(Seller) |> Repo.preload([:products])
   end
 
   @doc """
@@ -35,7 +35,7 @@ defmodule HelloElixir.Market do
       ** (Ecto.NoResultsError)
 
   """
-  def get_seller!(id), do: Repo.get!(Seller, id)
+  def get_seller!(id), do: Repo.get!(Seller, id) |> Repo.preload([:products])
 
   @doc """
   Creates a seller.
@@ -131,7 +131,7 @@ defmodule HelloElixir.Market do
       ** (Ecto.NoResultsError)
 
   """
-  def get_product!(id), do: Repo.get!(Product, id)
+  def get_product!(id), do: Repo.get!(Product, id) |> Repo.preload([:seller])
 
   @doc """
   Creates a product.
