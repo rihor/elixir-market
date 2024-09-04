@@ -1,9 +1,11 @@
 defmodule HelloElixir.Market.Seller do
+  alias HelloElixir.Market.Product
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "sellers" do
     field :name, :string
+    has_many :products, Product
 
     timestamps(type: :utc_datetime)
   end
