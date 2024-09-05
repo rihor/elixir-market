@@ -4,10 +4,17 @@ defmodule HelloElixir.Repo.Migrations.CreateUsersAuthTables do
   def change do
     execute "CREATE EXTENSION IF NOT EXISTS citext", ""
 
+    create table(:customers) do
+      add :address, :string
+
+      timestamps(type: :utc_datetime)
+    end
+
     create table(:users) do
       add :email, :citext, null: false
       add :hashed_password, :string, null: false
       add :confirmed_at, :utc_datetime
+      add :customer_id, references(:customers, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end

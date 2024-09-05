@@ -1,6 +1,8 @@
 defmodule HelloElixirWeb.UserSettingsLive do
+  alias HelloElixir.Market
   use HelloElixirWeb, :live_view
 
+  alias HelloElixir.Market.Customer
   alias HelloElixir.Accounts
 
   def render(assigns) do
@@ -33,6 +35,21 @@ defmodule HelloElixirWeb.UserSettingsLive do
           </:actions>
         </.simple_form>
       </div>
+      <div>
+        <.simple_form
+          for={@customer_form}
+          id="customer_form"
+          phx-submit="update_customer_info"
+          phx-change="validate_customer_info"
+        >
+          <.input field={@customer_form[:address]} type="text" label="Address" required />
+
+          <:actions>
+            <.button phx-disable-with="Changing...">Change Customer Data</.button>
+          </:actions>
+        </.simple_form>
+      </div>
+
       <div>
         <.simple_form
           for={@password_form}
@@ -90,6 +107,7 @@ defmodule HelloElixirWeb.UserSettingsLive do
     user = socket.assigns.current_user
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
+    customer_changeset = Customer.changeset(user.customer, %{})
 
     socket =
       socket
@@ -97,6 +115,8 @@ defmodule HelloElixirWeb.UserSettingsLive do
       |> assign(:email_form_current_password, nil)
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
+      |> assign(:email_form, to_form(email_changeset))
+      |> assign(:customer_form, to_form(customer_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:trigger_submit, false)
 
@@ -132,6 +152,34 @@ defmodule HelloElixirWeb.UserSettingsLive do
 
       {:error, changeset} ->
         {:noreply, assign(socket, :email_form, to_form(Map.put(changeset, :action, :insert)))}
+    end
+  end
+
+  def handle_event("validate_customer_info", params, socket) do
+    customer_form =
+      socket.assigns.current_user.customer
+      |> Customer.changeset(params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, customer_form: customer_form)}
+  end
+
+  def handle_event("update_customer_info", params, socket) do
+    customer = socket.assigns.current_user.customer
+
+    case Market.update_customer(customer, params["customer"]) do
+      {:ok, updated_customer} ->
+        customer_form = updated_customer |> Customer.changeset(%{}) |> to_form()
+
+        info = "Customer data updated successfully!"
+        {:noreply, socket |> put_flash(:info, info) |> assign(customer_form: customer_form)}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, :email_form, to_form(Map.put(changeset, :action, :insert)))}
+
+      val ->
+        "Bateu aqui!" |> IO.inspect(val)
     end
   end
 

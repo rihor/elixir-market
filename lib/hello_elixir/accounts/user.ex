@@ -1,4 +1,5 @@
 defmodule HelloElixir.Accounts.User do
+  alias HelloElixir.Market.Customer
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,6 +9,7 @@ defmodule HelloElixir.Accounts.User do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+    belongs_to :customer, Customer
 
     timestamps(type: :utc_datetime)
   end
@@ -37,7 +39,7 @@ defmodule HelloElixir.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :customer_id])
     |> validate_email(opts)
     |> validate_password(opts)
   end

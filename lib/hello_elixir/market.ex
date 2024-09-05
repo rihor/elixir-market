@@ -7,6 +7,7 @@ defmodule HelloElixir.Market do
   alias HelloElixir.Repo
 
   alias HelloElixir.Market.Seller
+  alias HelloElixir.Market.Customer
 
   @doc """
   Returns the list of sellers.
@@ -196,5 +197,31 @@ defmodule HelloElixir.Market do
   """
   def change_product(%Product{} = product, attrs \\ %{}) do
     Product.changeset(product, attrs)
+  end
+
+  ## User registration
+
+  @doc """
+  Registers a user.
+
+  ## Examples
+
+      iex> register_user(%{field: value})
+      {:ok, %User{}}
+
+      iex> register_user(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def register_customer(attrs) do
+    %Customer{}
+    |> Customer.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_customer(%Customer{} = customer, attrs) do
+    customer
+    |> Customer.changeset(attrs)
+    |> Repo.update()
   end
 end
