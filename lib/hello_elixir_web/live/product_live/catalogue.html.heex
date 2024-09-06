@@ -1,0 +1,5 @@
+<div id="newest" phx-update="stream">
+  <div :for={{id, product} <- @streams.products} id={id}>
+    <%= product.name %>
+  </div>
+</div>

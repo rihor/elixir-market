@@ -22,19 +22,16 @@ defmodule HelloElixirWeb.Router do
 
     get "/", PageController, :home
 
-    live "/sellers", SellerLive.Index, :index
-    live "/sellers/new", SellerLive.Index, :new
-    live "/sellers/:id/edit", SellerLive.Index, :edit
+    live_session :default, on_mount: {HelloElixirWeb.UserAuth, :mount_current_user} do
+      live "/catalogue", ProductLive.Catalogue, :catalogue
 
-    live "/sellers/:id", SellerLive.Show, :show
-    live "/sellers/:id/show/edit", SellerLive.Show, :edit
+      live "/products", ProductLive.Index, :index
+      live "/products/new", ProductLive.Index, :new
+      live "/products/:id/edit", ProductLive.Index, :edit
 
-    live "/products", ProductLive.Index, :index
-    live "/products/new", ProductLive.Index, :new
-    live "/products/:id/edit", ProductLive.Index, :edit
-
-    live "/products/:id", ProductLive.Show, :show
-    live "/products/:id/show/edit", ProductLive.Show, :edit
+      live "/products/:id", ProductLive.Show, :show
+      live "/products/:id/show/edit", ProductLive.Show, :edit
+    end
   end
 
   # Other scopes may use custom stacks.

@@ -6,102 +6,7 @@ defmodule HelloElixir.Market do
   import Ecto.Query, warn: false
   alias HelloElixir.Repo
 
-  alias HelloElixir.Market.Seller
   alias HelloElixir.Market.Customer
-
-  @doc """
-  Returns the list of sellers.
-
-  ## Examples
-
-      iex> list_sellers()
-      [%Seller{}, ...]
-
-  """
-  def list_sellers do
-    Repo.all(Seller) |> Repo.preload([:products])
-  end
-
-  @doc """
-  Gets a single seller.
-
-  Raises `Ecto.NoResultsError` if the Seller does not exist.
-
-  ## Examples
-
-      iex> get_seller!(123)
-      %Seller{}
-
-      iex> get_seller!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_seller!(id), do: Repo.get!(Seller, id) |> Repo.preload([:products])
-
-  @doc """
-  Creates a seller.
-
-  ## Examples
-
-      iex> create_seller(%{field: value})
-      {:ok, %Seller{}}
-
-      iex> create_seller(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_seller(attrs \\ %{}) do
-    %Seller{}
-    |> Seller.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a seller.
-
-  ## Examples
-
-      iex> update_seller(seller, %{field: new_value})
-      {:ok, %Seller{}}
-
-      iex> update_seller(seller, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_seller(%Seller{} = seller, attrs) do
-    seller
-    |> Seller.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a seller.
-
-  ## Examples
-
-      iex> delete_seller(seller)
-      {:ok, %Seller{}}
-
-      iex> delete_seller(seller)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_seller(%Seller{} = seller) do
-    Repo.delete(seller)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking seller changes.
-
-  ## Examples
-
-      iex> change_seller(seller)
-      %Ecto.Changeset{data: %Seller{}}
-
-  """
-  def change_seller(%Seller{} = seller, attrs \\ %{}) do
-    Seller.changeset(seller, attrs)
-  end
 
   alias HelloElixir.Market.Product
 
@@ -132,7 +37,7 @@ defmodule HelloElixir.Market do
       ** (Ecto.NoResultsError)
 
   """
-  def get_product!(id), do: Repo.get!(Product, id) |> Repo.preload([:seller])
+  def get_product!(id), do: Repo.get!(Product, id)
 
   @doc """
   Creates a product.
@@ -223,5 +128,101 @@ defmodule HelloElixir.Market do
     customer
     |> Customer.changeset(attrs)
     |> Repo.update()
+  end
+
+  alias HelloElixir.Market.Order
+
+  @doc """
+  Returns the list of orders.
+
+  ## Examples
+
+      iex> list_orders()
+      [%Order{}, ...]
+
+  """
+  def list_orders do
+    Repo.all(Order)
+  end
+
+  @doc """
+  Gets a single order.
+
+  Raises `Ecto.NoResultsError` if the Order does not exist.
+
+  ## Examples
+
+      iex> get_order!(123)
+      %Order{}
+
+      iex> get_order!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_order!(id), do: Repo.get!(Order, id)
+
+  @doc """
+  Creates a order.
+
+  ## Examples
+
+      iex> create_order(%{field: value})
+      {:ok, %Order{}}
+
+      iex> create_order(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_order(attrs \\ %{}) do
+    %Order{}
+    |> Order.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a order.
+
+  ## Examples
+
+      iex> update_order(order, %{field: new_value})
+      {:ok, %Order{}}
+
+      iex> update_order(order, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_order(%Order{} = order, attrs) do
+    order
+    |> Order.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a order.
+
+  ## Examples
+
+      iex> delete_order(order)
+      {:ok, %Order{}}
+
+      iex> delete_order(order)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_order(%Order{} = order) do
+    Repo.delete(order)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking order changes.
+
+  ## Examples
+
+      iex> change_order(order)
+      %Ecto.Changeset{data: %Order{}}
+
+  """
+  def change_order(%Order{} = order, attrs \\ %{}) do
+    Order.changeset(order, attrs)
   end
 end

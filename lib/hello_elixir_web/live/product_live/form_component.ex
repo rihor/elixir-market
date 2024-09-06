@@ -19,7 +19,7 @@ defmodule HelloElixirWeb.ProductLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-
+        <.input field={@form[:name]} label="Name" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Product</.button>
         </:actions>

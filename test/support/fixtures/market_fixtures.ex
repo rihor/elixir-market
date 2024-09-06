@@ -5,20 +5,6 @@ defmodule HelloElixir.MarketFixtures do
   """
 
   @doc """
-  Generate a seller.
-  """
-  def seller_fixture(attrs \\ %{}) do
-    {:ok, seller} =
-      attrs
-      |> Enum.into(%{
-        name: "some name"
-      })
-      |> HelloElixir.Market.create_seller()
-
-    seller
-  end
-
-  @doc """
   Generate a product.
   """
   def product_fixture(attrs \\ %{}) do
@@ -30,5 +16,19 @@ defmodule HelloElixir.MarketFixtures do
       |> HelloElixir.Market.create_product()
 
     product
+  end
+
+  @doc """
+  Generate a order.
+  """
+  def order_fixture(attrs \\ %{}) do
+    {:ok, order} =
+      attrs
+      |> Enum.into(%{
+
+      })
+      |> HelloElixir.Market.create_order()
+
+    order
   end
 end
