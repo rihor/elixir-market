@@ -4,6 +4,7 @@ defmodule HelloElixir.Market do
   """
 
   import Ecto.Query, warn: false
+  alias HelloElixir.Market.OrderProduct
   alias HelloElixir.Repo
 
   alias HelloElixir.Market.Customer
@@ -224,5 +225,46 @@ defmodule HelloElixir.Market do
   """
   def change_order(%Order{} = order, attrs \\ %{}) do
     Order.changeset(order, attrs)
+  end
+
+  @spec get_active_order(integer(), binary()) :: any()
+  def get_active_order(customer_id, socket_id) do
+    query =
+      from(o in Order,
+        where: o.status == ^:shopping,
+        limit: 1
+      )
+
+    query =
+      if customer_id do
+        from(o in query, where: o.customer_id == ^customer_id)
+      else
+        query
+      end
+
+    query =
+      from(o in query, where: o.logged_out_session == ^socket_id)
+
+    case Repo.one(query) |> IO.inspect() do
+      nil ->
+        %Order{}
+        |> Order.changeset(%{customer_id: customer_id, logged_out_session: socket_id})
+        |> Repo.insert!()
+
+      order ->
+        order
+    end
+  end
+
+  @spec add_product_to_order(integer(), integer(), binary()) :: any()
+  def add_product_to_order(product_id, customer_id, socket_id) do
+    Repo.transaction(fn ->
+      # get the active order
+      order = get_active_order(customer_id, socket_id)
+
+      %OrderProduct{}
+      |> OrderProduct.changeset(%{order_id: order.id, product_id: product_id})
+      |> Repo.insert!()
+    end)
   end
 end

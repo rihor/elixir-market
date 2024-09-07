@@ -1,5 +1,12 @@
-<div id="newest" phx-update="stream">
-  <div :for={{id, product} <- @streams.products} id={id}>
+<div id="newest" phx-update="stream" class="grid grid-rows-4 grid-flow-col gap-4 *:transition-all">
+  <button
+    :for={{id, product} <- @streams.products}
+    type="button"
+    id={id}
+    class="bg-blue-300 rounded p-3 hover:bg-blue-500"
+    phx-click="add_product_to_order"
+    phx-value-product-id={product.id}
+  >
     <%= product.name %>
-  </div>
+  </button>
 </div>
