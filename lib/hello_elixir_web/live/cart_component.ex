@@ -1,5 +1,4 @@
 defmodule HelloElixirWeb.CartComponent do
-  alias Ecto.Repo
   use HelloElixirWeb, :live_component
 
   alias HelloElixir.Market

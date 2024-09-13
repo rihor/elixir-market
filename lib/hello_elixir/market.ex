@@ -275,7 +275,7 @@ defmodule HelloElixir.Market do
   def create_or_increment_order_product(attrs) do
     %OrderProduct{}
     |> OrderProduct.changeset(attrs)
-    |> Repo.insert(conflict_target: :id, on_conflict: [inc: [quantity: 1]])
+    |> Repo.insert(conflict_target: [:order_id, :product_id], on_conflict: [inc: [quantity: 1]])
     |> notify_subscribers([:order_product, :added])
   end
 

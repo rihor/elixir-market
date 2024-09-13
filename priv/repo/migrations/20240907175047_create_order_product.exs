@@ -10,6 +10,6 @@ defmodule HelloElixir.Repo.Migrations.CreateOrderProduct do
       timestamps(type: :utc_datetime)
     end
 
-    create index(:order_products, [:order_id, :product_id])
+    create unique_index(:order_products, [:order_id, :product_id])
   end
 end

@@ -14,10 +14,11 @@
 
     <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
       <.live_component
-        module={HelloElixirWeb.CartComponent}
+        :if={assigns[:crsf_token] || assigns[:current_user]}
         id="cart"
-        current_user={@current_user}
-        session_id={@crsf_token}
+        module={HelloElixirWeb.CartComponent}
+        current_user={assigns[:current_user]}
+        session_id={assigns[:crsf_token]}
       />
       <%= if @current_user do %>
         <li class="text-[0.8125rem] leading-6 text-zinc-900">
