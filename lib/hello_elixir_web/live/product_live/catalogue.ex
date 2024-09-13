@@ -1,18 +1,29 @@
 defmodule HelloElixirWeb.ProductLive.Catalogue do
+  alias Phoenix.PubSub
   use HelloElixirWeb, :live_view
 
   alias HelloElixir.Market
+
+  @topic inspect(Market)
 
   @impl true
   def mount(_params, session, socket) do
     socket = assign(socket, :crsf_token, session["_csrf_token"])
 
+    if connected?(socket), do: PubSub.subscribe(HelloElixir.PubSub, @topic)
+
     {:ok, stream(socket, :products, Market.list_products())}
   end
 
   @impl true
-  def handle_info({:product_added, product}, socket) do
+  def handle_info({Market, [:product, :added], product}, socket) do
     {:noreply, stream_insert(socket, :products, product)}
+  end
+
+  @impl true
+  def handle_info(_msg, socket) do
+    # Ignore the message and return the socket unchanged
+    {:noreply, socket}
   end
 
   @impl true

@@ -7,6 +7,7 @@ defmodule HelloElixir.Market.OrderProduct do
   schema "order_products" do
     belongs_to :order, Order
     belongs_to :product, Product
+    field :quantity, :integer
 
     timestamps(type: :utc_datetime)
   end
@@ -14,7 +15,7 @@ defmodule HelloElixir.Market.OrderProduct do
   @doc false
   def changeset(order, attrs) do
     order
-    |> cast(attrs, [:order_id, :product_id])
+    |> cast(attrs, [:order_id, :product_id, :quantity])
     |> validate_required([:order_id, :product_id])
   end
 end

@@ -177,9 +177,6 @@ defmodule HelloElixirWeb.UserSettingsLive do
 
       {:error, changeset} ->
         {:noreply, assign(socket, :email_form, to_form(Map.put(changeset, :action, :insert)))}
-
-      val ->
-        "Bateu aqui!" |> IO.inspect(val)
     end
   end
 

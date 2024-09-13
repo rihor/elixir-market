@@ -22,7 +22,10 @@ defmodule HelloElixirWeb.Router do
 
     get "/", PageController, :home
 
-    live_session :default, on_mount: {HelloElixirWeb.UserAuth, :mount_current_user} do
+    live_session :default,
+      on_mount: [
+        {HelloElixirWeb.UserAuth, :mount_current_user}
+      ] do
       live "/catalogue", ProductLive.Catalogue, :catalogue
 
       live "/products", ProductLive.Index, :index

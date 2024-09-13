@@ -11,6 +11,16 @@ defmodule HelloElixir.Market do
 
   alias HelloElixir.Market.Product
 
+  @topic inspect(__MODULE__)
+
+  def subscribe do
+    Phoenix.PubSub.subscribe(HelloElixir.PubSub, @topic)
+  end
+
+  def subscribe(session_id) do
+    Phoenix.PubSub.subscribe(HelloElixir.PubSub, @topic <> "#{session_id}")
+  end
+
   @doc """
   Returns the list of products.
 
@@ -56,6 +66,7 @@ defmodule HelloElixir.Market do
     %Product{}
     |> Product.changeset(attrs)
     |> Repo.insert()
+    |> notify_subscribers([:product, :added])
   end
 
   @doc """
@@ -178,6 +189,7 @@ defmodule HelloElixir.Market do
     %Order{}
     |> Order.changeset(attrs)
     |> Repo.insert()
+    |> notify_subscribers([:order, :added])
   end
 
   @doc """
@@ -227,8 +239,10 @@ defmodule HelloElixir.Market do
     Order.changeset(order, attrs)
   end
 
-  @spec get_active_order(integer(), binary()) :: any()
-  def get_active_order(customer_id, socket_id) do
+  def get_active_order(nil = _customer_id, nil = _session_id), do: nil
+
+  @spec get_active_order(integer(), binary()) :: %Order{}
+  def get_active_order(customer_id, session_id) do
     query =
       from(o in Order,
         where: o.status == ^:shopping,
@@ -243,28 +257,54 @@ defmodule HelloElixir.Market do
       end
 
     query =
-      from(o in query, where: o.logged_out_session == ^socket_id)
+      from(o in query, where: o.logged_out_session == ^session_id)
 
-    case Repo.one(query) |> IO.inspect() do
+    case Repo.one(query) do
       nil ->
-        %Order{}
-        |> Order.changeset(%{customer_id: customer_id, logged_out_session: socket_id})
-        |> Repo.insert!()
+        create_order(%{customer_id: customer_id, logged_out_session: session_id})
 
       order ->
         order
     end
   end
 
-  @spec add_product_to_order(integer(), integer(), binary()) :: any()
-  def add_product_to_order(product_id, customer_id, socket_id) do
+  def get_active_order_with_products(customer_id, session_id) do
+    get_active_order(customer_id, session_id) |> Repo.preload(order_products: [:product])
+  end
+
+  def create_or_increment_order_product(attrs) do
+    %OrderProduct{}
+    |> OrderProduct.changeset(attrs)
+    |> Repo.insert(conflict_target: :id, on_conflict: [inc: [quantity: 1]])
+    |> notify_subscribers([:order_product, :added])
+  end
+
+  @spec add_product_to_order(integer(), integer(), binary()) :: %OrderProduct{}
+  def add_product_to_order(product_id, customer_id, session_id) do
     Repo.transaction(fn ->
       # get the active order
-      order = get_active_order(customer_id, socket_id)
+      order = get_active_order(customer_id, session_id)
 
-      %OrderProduct{}
-      |> OrderProduct.changeset(%{order_id: order.id, product_id: product_id})
-      |> Repo.insert!()
+      create_or_increment_order_product(%{order_id: order.id, product_id: product_id})
+      |> IO.inspect(label: "order_product")
     end)
   end
+
+  defp notify_subscribers({:ok, result}, event) do
+    Phoenix.PubSub.broadcast(
+      HelloElixir.PubSub,
+      @topic,
+      {__MODULE__, event, result}
+    )
+
+    Phoenix.PubSub.broadcast(
+      HelloElixir.PubSub,
+      @topic <> "#{result.id}",
+      {__MODULE__, event, result}
+    )
+
+    {:ok, result}
+  end
+
+  defp notify_subscribers({:error, reason}), do: {:error, reason}
 end
